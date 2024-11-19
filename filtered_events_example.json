@@ -1,0 +1,21 @@
+[
+  {
+    "name": "TransferBatch",
+    "block": "blockNumber : number",
+    "__cursor": "current accepted block : number",
+    "timestamp": "current block timestamp number",
+    "selector": "core::starknet::contract_address::ContractAddress 0xstring. of 32bytes padded with zero you can get it with hash.getSelectorFromName(\"Transfer\") tokal lenght",
+    "operator": "core::starknet::contract_address::ContractAddress --> type -> 0x32bytes string padded with zeroes",
+    "from": "core::starknet::contract_address::ContractAddress",
+    "to": "core::starknet::contract_address::ContractAddress",
+    "ids": "core::array::Span::<core::integer::u256> --> u256 made from low and high part will be BigInt -> type BigInt[]",
+    "values": "core::array::Span::<core::integer::u256> --> u256 made from low and high part will be BigInt -> type BigInt[]"
+  },
+
+  {
+    "name": "Transfer",
+    "from": "core::starknet::contract_address::ContractAddress -> 0xString ",
+    "to": "core::starknet::contract_address::ContractAddress",
+    "value": "core::integer::u256 -> BigInt"
+  }
+]
