@@ -3,6 +3,12 @@ export interface BlockData {
   events: Event[];
 }
 
+export interface Header {
+  blockNumber: number | string;
+  blockHash: string;
+  timestamp: number | string;
+}
+
 export interface Event {
   transaction: Transaction;
   event: EventDetails;
