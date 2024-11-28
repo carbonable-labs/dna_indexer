@@ -1,79 +1,135 @@
-import { Event, EventDetails, Header, Transaction } from "./types.ts";
 import type {
   Config,
   NetworkOptions,
   SinkOptions,
 } from "https://esm.sh/@apibara/indexer";
-import { hash, uint256 } from "https://esm.run/starknet@5.14";
-import { formatUnits } from "https://esm.run/viem@1.4";
-const DECIMALS = 18;
+import { hash } from "https://esm.run/starknet@5.14";
 
-export const config: Config<NetworkOptions, SinkOptions> = {
-  streamUrl: "https://mainnet.starknet.a5a.ch",
-  startingBlock: 898985, // Block number
-  finality: "DATA_STATUS_ACCEPTED",
-  network: "starknet",
-  filter: {
-    header: { weak: true },
-    events: [
-      {
-        fromAddress: "address of the contract",
-        keys: ["selector or ", hash.getSelectorFromName("Name of the event")],
-      },
-    ],
-  },
-  sinkType: "postgres",
-  sinkOptions: {
-    noTls: true,
-    tableName: "transfers",
-  },
-};
+const ContractAddress = "";
+const contractClassFilePath = "";
+const eventsToParse: string[] = [];
 
-export default function transform({
-  header,
-  events,
-}: {
-  header: Header;
-  events: Event[];
-}) {
-  const { blockNumber, blockHash, timestamp } = header;
-  console.log(`-------------\n\n${JSON.stringify(header)}\n\n`);
+async function loadContractEvents(filePath: string) {
+  const fileContent = await Deno.readTextFile(filePath);
+  const contractData = JSON.parse(fileContent);
+  const abi = JSON.parse(contractData.abi);
 
-  return events.map(
-    ({
-      event,
-      transaction,
-    }: {
-      event: EventDetails;
-      transaction: Transaction;
-    }) => {
+  // Extract and normalize events
+  const events = abi
+    .filter((item: any) => item.type === "event")
+    .map((event: any) => ({
+      eventName: event.name,
+      selectorName: event.name.split("::").pop(),
+      members: event.members,
+    }));
+
+  const matchedEvents = events.filter((event: any) =>
+    eventsToParse.includes(event.selectorName)
+  );
+
+  if (matchedEvents.length === 0) {
+    console.error("No matching events found in the ABI.");
+    return;
+  }
+
+  return events.reduce(
+    (map: Record<string, any>, event: any) => ({
+      ...map,
+      [event.selector]: event,
+    }),
+    {}
+  );
+}
+
+function generateConfig(
+  eventsMetadata: Record<string, any>
+): Config<NetworkOptions, SinkOptions> {
+  const filterEvents = eventsMetadata.map((event: any) => ({
+    fromAddress: ContractAddress,
+    // @ts-ignore: hash.getSelectorName exists
+    keys: [hash.getSelectorFromName(event.selectorName)],
+    includeTransaction: true,
+    includeReceipt: false,
+  }));
+
+  return {
+    streamUrl: "https://sepolia.starknet.a5a.ch",
+    startingBlock: 100000,
+    finality: "DATA_STATUS_ACCEPTED",
+    network: "starknet",
+    filter: {
+      header: { weak: true },
+      events: filterEvents,
+    },
+    sinkType: "postgres",
+    sinkOptions: {
+      noTls: true,
+      tableName: "transactions",
+      connectionString:
+        "postgresql://postgres:postgres@127.0.0.1:54322/postgres",
+    },
+  };
+}
+
+function parseObject(type: string, data: string) {
+  return "";
+}
+
+function createTransformFunction(eventsMetadata: Record<string, any>) {
+  return function transform({
+    header,
+    events,
+  }: {
+    header: { blockNumber: string; blockHash: string; timestamp: string };
+    events: Array<{
+      event: { keys: string[]; data: string[] };
+      transaction: { meta: { hash: string } };
+    }>;
+  }) {
+    const { blockNumber, blockHash, timestamp } = header;
+
+    return events.map(({ event, transaction }) => {
       const transactionHash = transaction.meta.hash;
-      const transferId = `${transactionHash}_${event.index}`;
+      const eventSelector = event.keys[0];
 
-      const [fromAddress, toAddress, amountLow, amountHigh] = event.data;
+      // Check if the event selector matches a stored event
+      const eventMetadata = eventsMetadata[eventSelector];
 
-      const amountRaw = uint256.uint256ToBN({
-        low: amountLow,
-        high: amountHigh,
-      });
+      if (!eventMetadata) {
+        console.warn(`Unknown event with selector: ${eventSelector}`);
+        return null;
+      }
 
-      const amount = formatUnits(amountRaw, DECIMALS);
+      // Transform event data based on member types
+      const transformedData: Record<string, any> = {};
+      const eventData = event.data;
 
-      // Convert to snake_case because it works better with postgres.
+      for (let i = 0; i < eventData.length; i++) {
+        const type = eventMetadata[0].member.type.split("::").pop();
+        const data = eventData[0];
+        // transform the data according to type;
+        const _data = parseObject(type, data);
+        transformedData[eventMetadata[0].member.name] = _data;
+      }
+
       return {
-        network: "starknet-mainnet",
-        symbol: "ETH",
+        network: "starknet-sepolia",
         block_hash: blockHash,
         block_number: +blockNumber,
         block_timestamp: timestamp,
         transaction_hash: transactionHash,
-        transfer_id: transferId,
-        from_address: fromAddress,
-        to_address: toAddress,
-        amount: +amount,
-        amount_raw: amountRaw.toString(),
+        event_name: eventMetadata.originalName,
+        data: transformedData,
       };
-    }
-  );
+    });
+  };
 }
-// It's gonna log here
+
+// Load events metadata from contractClassFile
+const eventsMetadata = await loadContractEvents(contractClassFilePath);
+
+// Set up config for apibara using those events
+export const config = generateConfig(eventsMetadata);
+
+// Create the transform function
+export const transform = createTransformFunction(eventsMetadata);
