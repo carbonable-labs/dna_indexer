@@ -19,7 +19,8 @@ async function loadContractEvents(filePath: string) {
     .filter((item: any) => item.type === "event")
     .map((event: any) => ({
       eventName: event.name,
-      selectorName: event.name.split("::").pop(),
+      // @ts-ignore: hash.getSelectorName exists
+      selector: hash.getSelectorFromName(event.name.split("::").pop()),
       members: event.members,
     }));
 
@@ -46,8 +47,7 @@ function generateConfig(
 ): Config<NetworkOptions, SinkOptions> {
   const filterEvents = eventsMetadata.map((event: any) => ({
     fromAddress: ContractAddress,
-    // @ts-ignore: hash.getSelectorName exists
-    keys: [hash.getSelectorFromName(event.selectorName)],
+    keys: [event.selector],
     includeTransaction: true,
     includeReceipt: false,
   }));
