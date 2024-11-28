@@ -3,12 +3,48 @@ import type {
   NetworkOptions,
   SinkOptions,
 } from "https://esm.sh/@apibara/indexer";
-import { hash } from "https://esm.run/starknet@5.14";
+import { hash, uint256, shortString } from "https://esm.run/starknet@5.14";
+import { Header, Event } from "./types.ts";
 
 const ContractAddress = "";
 const contractClassFilePath = "";
 const eventsToParse: string[] = [];
 
+/**
+ * Helper: Split hex string into `low` and `high` for uint256.
+ */
+function splitHexToUint256(hex: string): { low: string; high: string } {
+  const paddedHex = hex.slice(2).padStart(64, "0");
+  const high = "0x" + paddedHex.slice(0, 32);
+  const low = "0x" + paddedHex.slice(32);
+  return { low, high };
+}
+
+/**
+ * Helper: Trim leading zeros from hex strings.
+ */
+function trimLeadingZeros(hexString: string): string {
+  if (hexString.startsWith("0x")) {
+    const trimmed = hexString.slice(2).replace(/^0+/, "");
+    return "0x" + trimmed;
+  }
+  return hexString.replace(/^0+/, "");
+}
+
+function escapeInvalidCharacters(str: string) {
+  return str.replace(/^[\x00-\x1F]+/, "");
+}
+
+function parseBool(data: string): boolean {
+  const normalizedData = data.startsWith("0x")
+    ? parseInt(data, 16)
+    : parseInt(data, 10);
+  return normalizedData !== 0;
+}
+
+/**
+ * Load events metadata from the contract class file.
+ */
 async function loadContractEvents(filePath: string) {
   const fileContent = await Deno.readTextFile(filePath);
   const contractData = JSON.parse(fileContent);
@@ -19,21 +55,21 @@ async function loadContractEvents(filePath: string) {
     .filter((item: any) => item.type === "event")
     .map((event: any) => ({
       eventName: event.name,
-      // @ts-ignore: hash.getSelectorName exists
       selector: hash.getSelectorFromName(event.name.split("::").pop()),
       members: event.members,
     }));
 
+  // Match events based on `eventsToParse`
   const matchedEvents = events.filter((event: any) =>
-    eventsToParse.includes(event.selectorName)
+    eventsToParse.includes(event.eventName.split("::").pop())
   );
 
   if (matchedEvents.length === 0) {
     console.error("No matching events found in the ABI.");
-    return;
+    return {};
   }
 
-  return events.reduce(
+  return matchedEvents.reduce(
     (map: Record<string, any>, event: any) => ({
       ...map,
       [event.selector]: event,
@@ -42,10 +78,13 @@ async function loadContractEvents(filePath: string) {
   );
 }
 
+/**
+ * Generate Apibara config for the matched events.
+ */
 function generateConfig(
   eventsMetadata: Record<string, any>
 ): Config<NetworkOptions, SinkOptions> {
-  const filterEvents = eventsMetadata.map((event: any) => ({
+  const filterEvents = Object.values(eventsMetadata).map((event: any) => ({
     fromAddress: ContractAddress,
     keys: [event.selector],
     includeTransaction: true,
@@ -71,20 +110,38 @@ function generateConfig(
   };
 }
 
+/**
+ * Parse data based on its type.
+ */
 function parseObject(type: string, data: string) {
-  return "";
+  switch (type) {
+    case "u256": {
+      const { low, high } = splitHexToUint256(data);
+      return uint256.uint256ToBN({ low, high }).toString();
+    }
+    case "felt252":
+      return data;
+    case "string":
+      return escapeInvalidCharacters(shortString.decodeShortString(data));
+    case "hex":
+      return trimLeadingZeros(data);
+    case "bool":
+      return parseBool(data);
+    default:
+      return data;
+  }
 }
 
+/**
+ * Create the transform function for Apibara.
+ */
 function createTransformFunction(eventsMetadata: Record<string, any>) {
   return function transform({
     header,
     events,
   }: {
-    header: { blockNumber: string; blockHash: string; timestamp: string };
-    events: Array<{
-      event: { keys: string[]; data: string[] };
-      transaction: { meta: { hash: string } };
-    }>;
+    header: Header;
+    events: Event[];
   }) {
     const { blockNumber, blockHash, timestamp } = header;
 
@@ -105,11 +162,12 @@ function createTransformFunction(eventsMetadata: Record<string, any>) {
       const eventData = event.data;
 
       for (let i = 0; i < eventData.length; i++) {
-        const type = eventMetadata[0].member.type.split("::").pop();
-        const data = eventData[0];
-        // transform the data according to type;
-        const _data = parseObject(type, data);
-        transformedData[eventMetadata[0].member.name] = _data;
+        const member = eventMetadata.members[i];
+        const data = eventData[i];
+        transformedData[member.name] = parseObject(
+          member.type.split("::").pop(),
+          data
+        );
       }
 
       return {
@@ -118,18 +176,19 @@ function createTransformFunction(eventsMetadata: Record<string, any>) {
         block_number: +blockNumber,
         block_timestamp: timestamp,
         transaction_hash: transactionHash,
-        event_name: eventMetadata.originalName,
+        event_name: eventMetadata.eventName,
         data: transformedData,
       };
     });
   };
 }
 
-// Load events metadata from contractClassFile
+// Main Execution
 const eventsMetadata = await loadContractEvents(contractClassFilePath);
+if (!eventsMetadata) {
+  console.error("Failed to load events metadata.");
+  Deno.exit(1);
+}
 
-// Set up config for apibara using those events
 export const config = generateConfig(eventsMetadata);
-
-// Create the transform function
 export const transform = createTransformFunction(eventsMetadata);
