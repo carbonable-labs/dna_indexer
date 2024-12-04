@@ -1,0 +1,22 @@
+{
+  "name": "my-indexer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "apibara dev",
+    "build": "apibara build",
+    "start": "apibara start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@apibara/indexer": "^2.0.0-beta.23",
+    "@apibara/protocol": "^2.0.0-beta.23",
+    "@apibara/starknet": "^2.0.0-beta.23",
+    "apibara": "^2.0.0-beta.23",
+    "nats": "^2.28.2"
+  }
+}

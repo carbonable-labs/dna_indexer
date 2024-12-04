@@ -6,6 +6,18 @@ Parse events and push it to pgsql db
 
 [Apibara doc](https://www.apibara.com/docs)
 
+Running with
+
+```
+npm run dev -- --indexers config-name
+```
+
+Example
+
+```
+ npm run dev  -- --indexers starknet-test
+```
+
 # Tips
 
 If you don't want to compile (with scarb or other, contract to get class ) if you wanna extract a class from contract in mainnet or else run
