@@ -1,0 +1,24 @@
+[
+  {
+    "type": "event",
+    "name": "carbon::components::offset::module::Offset::Claim",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "address",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "time",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  }
+]

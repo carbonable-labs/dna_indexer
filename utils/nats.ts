@@ -7,8 +7,6 @@ import {
 } from "nats";
 
 const DEFAULT_STREAM_CONFIG: any = {
-  name: "test",
-  subjects: ["indexer.>"], // Added back as it's required
   storage: "file", // Added for persistence
   retention: "workqueue", // Added for message handling
 };
