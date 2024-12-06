@@ -33,13 +33,14 @@ export class EventMapper {
   }
 
   public getEventName(selector: string): string | undefined {
-    return this.nameMap.get(selector)?.toString();
+    let name = this.nameMap.get(selector);
+    return name ? name.toString() : selector;
   }
 
   public createObjectFromAbi(selector: string, data: string[]): any {
     const eventAbi = this.eventsMap.get(selector);
     if (!eventAbi) {
-      throw new Error(`Unknown event: ${selector}`);
+      return { data };
     }
 
     let result: any = {};

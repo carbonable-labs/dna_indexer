@@ -1,0 +1,36 @@
+[
+  {
+    "type": "event",
+    "name": "carbon::components::absorber::module::Absorber::AbsorptionUpdate",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "slot",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "time",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon::components::absorber::module::Absorber::ProjectValueUpdate",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "slot",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "value",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  }
+]

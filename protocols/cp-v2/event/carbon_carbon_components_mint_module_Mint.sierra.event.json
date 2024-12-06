@@ -1,0 +1,106 @@
+[
+  {
+    "type": "event",
+    "name": "carbon::components::mint::module::Mint::PreSaleOpen",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "time",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon::components::mint::module::Mint::PreSaleClose",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "time",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon::components::mint::module::Mint::PublicSaleOpen",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "time",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon::components::mint::module::Mint::PublicSaleClose",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "time",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon::components::mint::module::Mint::SoldOut",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "time",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon::components::mint::module::Mint::Airdrop",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "to",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "value",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "time",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon::components::mint::module::Mint::Buy",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "address",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "value",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "time",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  }
+]
