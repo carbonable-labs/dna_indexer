@@ -47,18 +47,24 @@ export class EventMapper {
     let dataIndex = 0;
 
     for (const member of eventAbi.members) {
-      switch (member.type) {
-        case "core::integer::u256":
+      switch (member.type.split("::").pop()) {
+        case "u256":
           result[member.name] = uint256
             .uint256ToBN({ low: data[dataIndex], high: data[dataIndex + 1] })
             .toString(10);
           dataIndex += 2;
           break;
-        case "core::starknet::contract_address::ContractAddress":
+        case "ContractAddress":
+        case "ClassHash":
           result[member.name] = data[dataIndex];
           dataIndex += 1;
           break;
-        case "core::bool":
+        case "u64":
+        case "u32":
+          result[member.name] = parseInt(data[dataIndex]);
+          dataIndex += 1;
+          break;
+        case "bool":
           result[member.name] = Boolean(BigInt(data[dataIndex]));
           dataIndex += 1;
           break;
