@@ -4,20 +4,24 @@ import { NatsClient } from "./nats";
 import { EventMapper } from "./parser";
 import { readdirSync, readFileSync } from "fs";
 import { join } from "path";
+import { SchemaGenerator } from "./db-generator";
 
 export function setupIndexer(appName: string) {
-  const eventsPath = join(__dirname, `../../protocols/${appName}`);
+  const appPath = join(__dirname, `../../protocols/${appName}`);
   const addresses = JSON.parse(
-    readFileSync(join(eventsPath, "addresses/mainnet.json"), "utf8")
+    readFileSync(join(appPath, "addresses/mainnet.json"), "utf8")
   );
+
+  const eventPass = join(appPath, "events");
   const events = addresses.map((address) => ({ address }));
 
-  const mergedAbi = readdirSync(eventsPath)
+  const mergedAbi = readdirSync(eventPass)
     .filter((file) => file.endsWith(".json"))
-    .map((file) => JSON.parse(readFileSync(join(eventsPath, file), "utf8")))
+    .map((file) => JSON.parse(readFileSync(join(eventPass, file), "utf8")))
     .flat();
 
   const eventMapper = new EventMapper(mergedAbi);
+  const schemaGenerator = new SchemaGenerator();
   let natsClient: NatsClient;
 
   const setupNats = async () => {
@@ -27,6 +31,11 @@ export function setupIndexer(appName: string) {
     });
     await client.connect();
     await client.createStreamIfNotExists();
+    const schemaSubject = `indexer.${appName}.event`;
+
+    const newSchema = schemaGenerator.generateSqlSchema(mergedAbi);
+    await client.initSchema(newSchema, schemaSubject);
+
     return client;
   };
 
@@ -43,14 +52,14 @@ export function setupIndexer(appName: string) {
     async transform({ block }) {
       const { events, header } = block;
       for (const event of events) {
-        const { selector: selectorStr, data } = extractSlectorAndData(
+        const { selector, data } = extractSlectorAndData(
           event.keys!,
           event.data!
         );
-        const selector = removeLeadingZeros(selectorStr);
         const object = eventMapper.createObjectFromAbi(selector, data);
         const name = eventMapper.getEventName(selector);
-        const natsString = `indexer.${appName}.${name}.${event.address}.ACCEPTED.${header?.blockNumber}.${event.transactionHash}`;
+
+        const natsString = `indexer.${appName}.event.${name}.${event.address}.ACCEPTED.${header?.blockNumber}.${event.transactionHash}`;
         await natsClient.publish(natsString, object);
       }
     },
@@ -73,10 +82,4 @@ function extractSlectorAndData(
     selector: array1[0],
     data: [...array1.slice(1), ...array2],
   };
-}
-
-function removeLeadingZeros(hex: string): string {
-  const [prefix, numbers] = hex.split("0x");
-  const cleanNumbers = numbers.replace(/^0+(?=\d)/, "");
-  return `0x${cleanNumbers}`;
 }

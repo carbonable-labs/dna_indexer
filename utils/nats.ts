@@ -59,7 +59,28 @@ export class NatsClient {
       throw err;
     }
   }
+  async initSchema(schema: string, subject: string) {
+    if (!this.js) {
+      throw new Error("JetStream manager not initialized");
+    }
 
+    console.log("🔍 Checking schema for:", subject);
+    const kv = await this.js.views.kv("schemas");
+    const entry = await kv.get(subject);
+
+    if (entry) {
+      const existingSchema = new TextDecoder().decode(entry.value);
+      if (existingSchema !== schema) {
+        await kv.put(subject, schema);
+        console.log("📝 Schema updated for:", subject);
+      } else {
+        console.log("✅ Schema already up to date for:", subject);
+      }
+    } else {
+      await kv.put(subject, schema);
+      console.log("🆕 Initial schema created for:", subject);
+    }
+  }
   async createStreamIfNotExists(): Promise<void> {
     if (!this.jsm) {
       throw new Error("JetStream manager not initialized");

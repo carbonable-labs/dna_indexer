@@ -15,8 +15,8 @@ export interface EventAbi {
 }
 
 export class EventMapper {
-  private eventsMap = new Map<string, EventAbi>();
-  private nameMap = new Map<string, String>();
+  private eventsMap = new Map<bigint, EventAbi>();
+  private nameMap = new Map<bigint, String>();
 
   constructor(abi: EventAbi[]) {
     this.initializeEventsMap(abi);
@@ -25,7 +25,7 @@ export class EventMapper {
   private initializeEventsMap(abi: EventAbi[]) {
     for (const event of abi) {
       const shortName = event.name.split("::").pop() || event.name;
-      const selector = hash.getSelector(shortName);
+      const selector = BigInt(hash.getSelector(shortName));
       this.eventsMap.set(selector, event);
       this.nameMap.set(selector, shortName);
       console.log(`✅ Loaded event: ${shortName} with selector ${selector}`);
@@ -33,12 +33,14 @@ export class EventMapper {
   }
 
   public getEventName(selector: string): string | undefined {
-    let name = this.nameMap.get(selector);
+    const selectorBN = BigInt(selector);
+    let name = this.nameMap.get(selectorBN);
     return name ? name.toString() : selector;
   }
 
   public createObjectFromAbi(selector: string, data: string[]): any {
-    const eventAbi = this.eventsMap.get(selector);
+    const selectorBN = BigInt(selector);
+    const eventAbi = this.eventsMap.get(selectorBN);
     if (!eventAbi) {
       return { data };
     }
