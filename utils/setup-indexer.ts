@@ -2,26 +2,22 @@ import { StarknetStream } from "@apibara/starknet";
 import { defineIndexer } from "@apibara/indexer";
 import { NatsClient } from "./nats";
 import { EventMapper } from "./parser";
-import { readdirSync, readFileSync } from "fs";
-import { join } from "path";
-import { SchemaGenerator } from "./db-generator";
 
+import * as schema from "../drizzle/schema";
+import { db } from "../drizzle/dbConnexion";
+import crypto from "crypto";
+
+import { extractAndMergeAbi, getAppAddresses } from "./extract-and-merge-abi";
+import { json } from "stream/consumers";
+
+function pascalToSnakeCase(str: string): string {
+  return str.replace(/([a-z])([A-Z])/g, "$1_$2").toLowerCase();
+}
 export function setupIndexer(appName: string) {
-  const appPath = join(__dirname, `../../protocols/${appName}`);
-  const addresses = JSON.parse(
-    readFileSync(join(appPath, "addresses/mainnet.json"), "utf8")
-  );
-
-  const eventPass = join(appPath, "events");
+  const addresses = getAppAddresses(appName);
+  const mergedAbi = extractAndMergeAbi(appName);
   const events = addresses.map((address) => ({ address }));
-
-  const mergedAbi = readdirSync(eventPass)
-    .filter((file) => file.endsWith(".json"))
-    .map((file) => JSON.parse(readFileSync(join(eventPass, file), "utf8")))
-    .flat();
-
   const eventMapper = new EventMapper(mergedAbi);
-  const schemaGenerator = new SchemaGenerator();
   let natsClient: NatsClient;
 
   const setupNats = async () => {
@@ -31,11 +27,6 @@ export function setupIndexer(appName: string) {
     });
     await client.connect();
     await client.createStreamIfNotExists();
-    const schemaSubject = `indexer.${appName}.event`;
-
-    const newSchema = schemaGenerator.generateSqlSchema(mergedAbi);
-    await client.initSchema(newSchema, schemaSubject);
-
     return client;
   };
 
@@ -57,15 +48,45 @@ export function setupIndexer(appName: string) {
           event.data!
         );
         const object = eventMapper.createObjectFromAbi(selector, data);
+        const event_id = generateEventId(object, event.transactionHash!);
         const name = eventMapper.getEventName(selector);
-
+        if (!name) {
+          console.error(`Event with selector ${selector} not found`);
+          await schema["unknown_events"];
+          continue;
+        }
+        const table = schema[pascalToSnakeCase(name)];
+        try {
+          await table
+            .insert({
+              event_id,
+              contract_address: event.address,
+              tx_hash: event.transactionHash,
+              block_number: header?.blockNumber,
+              // Other fields
+            })
+            .onConflict((cd) => cd.column(table.event_id).doNothing())
+            .run();
+        } catch (error) {
+          if (error.code === "23505") {
+            // Unique constraint violation
+            console.log("Event already exists, skipping");
+          } else {
+            console.error(error);
+          }
+        }
         const natsString = `indexer.${appName}.event.${name}.${event.address}.ACCEPTED.${header?.blockNumber}.${event.transactionHash}`;
+        console.log(natsString, object);
         await natsClient.publish(natsString, object);
       }
     },
   });
 }
-
+function generateEventId(event: string, txHash: string) {
+  const hash = crypto.createHash("sha256");
+  hash.update(JSON.stringify(event) + txHash);
+  return hash.digest("base64");
+}
 type ArrayProcessingResult = {
   selector: string;
   data: string[];
