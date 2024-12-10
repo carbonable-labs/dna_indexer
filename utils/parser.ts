@@ -35,7 +35,7 @@ export class EventMapper {
   public getEventName(selector: string): string | undefined {
     const selectorBN = BigInt(selector);
     let name = this.nameMap.get(selectorBN);
-    return name ? name.toString() : selector;
+    return name ? name.toString() : undefined;
   }
 
   public createObjectFromAbi(selector: string, data: string[]): any {
