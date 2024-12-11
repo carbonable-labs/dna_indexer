@@ -1,0 +1,368 @@
+[
+  {
+    "type": "event",
+    "name": "carbon_v3::components::erc1155::erc1155::ERC1155Component::TransferSingle",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "operator",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "from",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "to",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "id",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "value",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::erc1155::erc1155::ERC1155Component::TransferBatch",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "operator",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "from",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "to",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "ids",
+        "type": "core::array::Span::<core::integer::u256>",
+        "kind": "data"
+      },
+      {
+        "name": "values",
+        "type": "core::array::Span::<core::integer::u256>",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::erc1155::erc1155::ERC1155Component::ApprovalForAll",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "owner",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "operator",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "approved",
+        "type": "core::bool",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::erc1155::erc1155::ERC1155Component::URI",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "value",
+        "type": "core::byte_array::ByteArray",
+        "kind": "data"
+      },
+      {
+        "name": "id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "openzeppelin_access::ownable::ownable::OwnableComponent::OwnershipTransferred",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "previous_owner",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "new_owner",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "openzeppelin_access::ownable::ownable::OwnableComponent::OwnershipTransferStarted",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "previous_owner",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "new_owner",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "openzeppelin_upgrades::upgradeable::UpgradeableComponent::Upgraded",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "class_hash",
+        "type": "core::starknet::class_hash::ClassHash",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::vintage::vintage::VintageComponent::ProjectCarbonUpdated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "old_carbon",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "new_carbon",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::vintage::vintage::VintageComponent::VintageUpdate",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "token_id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      },
+      {
+        "name": "old_vintage",
+        "type": "carbon_v3::models::CarbonVintage",
+        "kind": "data"
+      },
+      {
+        "name": "new_vintage",
+        "type": "carbon_v3::models::CarbonVintage",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::vintage::vintage::VintageComponent::VintageRebased",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "token_id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      },
+      {
+        "name": "old_supply",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "new_supply",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::vintage::vintage::VintageComponent::VintageStatusUpdated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "token_id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      },
+      {
+        "name": "old_status",
+        "type": "carbon_v3::models::CarbonVintageType",
+        "kind": "data"
+      },
+      {
+        "name": "new_status",
+        "type": "carbon_v3::models::CarbonVintageType",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::vintage::vintage::VintageComponent::VintageSet",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "token_id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      },
+      {
+        "name": "old_vintage",
+        "type": "carbon_v3::models::CarbonVintage",
+        "kind": "data"
+      },
+      {
+        "name": "new_vintage",
+        "type": "carbon_v3::models::CarbonVintage",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleGranted",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "role",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "account",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "sender",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleRevoked",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "role",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "account",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "sender",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleAdminChanged",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "role",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "previous_admin_role",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "new_admin_role",
+        "type": "core::felt252",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "erc4906::erc4906_component::ERC4906Component::MetadataUpdate",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "token_id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "erc4906::erc4906_component::ERC4906Component::BatchMetadataUpdate",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "from_token_id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      },
+      {
+        "name": "to_token_id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::metadata::MetadataComponent::MetadataUpgraded",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "old_class_hash",
+        "type": "core::starknet::class_hash::ClassHash",
+        "kind": "data"
+      },
+      {
+        "name": "class_hash",
+        "type": "core::starknet::class_hash::ClassHash",
+        "kind": "data"
+      }
+    ]
+  }
+]

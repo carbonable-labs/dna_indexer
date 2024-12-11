@@ -1,0 +1,19 @@
+[
+  {
+    "type": "event",
+    "name": "carbon_v3::components::metadata::MetadataComponent::MetadataUpgraded",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "old_class_hash",
+        "type": "core::starknet::class_hash::ClassHash",
+        "kind": "data"
+      },
+      {
+        "name": "class_hash",
+        "type": "core::starknet::class_hash::ClassHash",
+        "kind": "data"
+      }
+    ]
+  }
+]

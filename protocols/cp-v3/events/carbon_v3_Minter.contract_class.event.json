@@ -1,0 +1,252 @@
+[
+  {
+    "type": "event",
+    "name": "openzeppelin_access::ownable::ownable::OwnableComponent::OwnershipTransferred",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "previous_owner",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "new_owner",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "openzeppelin_access::ownable::ownable::OwnableComponent::OwnershipTransferStarted",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "previous_owner",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "new_owner",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "openzeppelin_upgrades::upgradeable::UpgradeableComponent::Upgraded",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "class_hash",
+        "type": "core::starknet::class_hash::ClassHash",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::minter::mint::MintComponent::PublicSaleOpen",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "old_value",
+        "type": "core::bool",
+        "kind": "data"
+      },
+      {
+        "name": "new_value",
+        "type": "core::bool",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::minter::mint::MintComponent::PublicSaleClose",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "old_value",
+        "type": "core::bool",
+        "kind": "data"
+      },
+      {
+        "name": "new_value",
+        "type": "core::bool",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::minter::mint::MintComponent::SoldOut",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "sold_out",
+        "type": "core::bool",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::minter::mint::MintComponent::Buy",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "address",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "cc_amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "vintages",
+        "type": "core::array::Span::<core::integer::u256>",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::minter::mint::MintComponent::MintCanceled",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "is_canceled",
+        "type": "core::bool",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::minter::mint::MintComponent::UnitPriceUpdated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "old_price",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "new_price",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::minter::mint::MintComponent::Withdraw",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "recipient",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::minter::mint::MintComponent::AmountRetrieved",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "token_address",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "recipient",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::minter::mint::MintComponent::MinMoneyAmountPerTxUpdated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "old_amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "new_amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::minter::mint::MintComponent::RemainingMintableCCUpdated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "old_value",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "new_value",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::minter::mint::MintComponent::MaxMintableCCUpdated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "old_value",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "new_value",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "carbon_v3::components::minter::mint::MintComponent::RedeemInvestment",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "address",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  }
+]

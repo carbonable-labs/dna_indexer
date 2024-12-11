@@ -3,7 +3,7 @@ import { defineIndexer } from "@apibara/indexer";
 import { NatsClient } from "./nats";
 import { EventMapper } from "./parser";
 
-import * as schema from "../drizzle/schema";
+import * as schema from "../schema";
 import { db } from "../drizzle/dbConnexion";
 import crypto from "crypto";
 
